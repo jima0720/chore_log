@@ -12,7 +12,24 @@ class ChoreManager {
     // localStorageから家事データを読み込む
     loadChores() {
         const data = localStorage.getItem(STORAGE_KEY);
-        return data ? JSON.parse(data) : [];
+        const chores = data ? JSON.parse(data) : [];
+        // 既存データのマイグレーション（lastDone → history）
+        return chores.map(chore => this.migrateChoreData(chore));
+    }
+
+    // 旧データ形式から新データ形式への変換
+    migrateChoreData(chore) {
+        // 既に新形式の場合はそのまま返す
+        if (chore.history !== undefined) {
+            return chore;
+        }
+        // 旧形式の場合は変換
+        return {
+            id: chore.id,
+            name: chore.name,
+            history: chore.lastDone ? [chore.lastDone] : [],
+            createdAt: chore.createdAt
+        };
     }
 
     // localStorageに家事データを保存
@@ -25,7 +42,7 @@ class ChoreManager {
         const chore = {
             id: Date.now().toString(),
             name: name,
-            lastDone: null,
+            history: [],
             createdAt: new Date().toISOString()
         };
         this.chores.push(chore);
@@ -39,11 +56,34 @@ class ChoreManager {
         this.saveChores();
     }
 
-    // 家事の実施記録を更新
+    // 家事の実施記録を更新（今日の日付）
     markAsDone(id) {
+        const date = new Date().toISOString();
+        this.addHistory(id, date);
+    }
+
+    // 家事の実施記録を追加（日付指定）
+    addHistory(id, dateString) {
         const chore = this.chores.find(chore => chore.id === id);
         if (chore) {
-            chore.lastDone = new Date().toISOString();
+            // 履歴に追加（重複チェック）
+            const dateOnly = dateString.split('T')[0];
+            const exists = chore.history.some(h => h.split('T')[0] === dateOnly);
+
+            if (!exists) {
+                chore.history.push(dateString);
+                // 新しい順にソート
+                chore.history.sort((a, b) => new Date(b) - new Date(a));
+                this.saveChores();
+            }
+        }
+    }
+
+    // 履歴から特定の記録を削除
+    deleteHistory(choreId, dateString) {
+        const chore = this.chores.find(chore => chore.id === choreId);
+        if (chore) {
+            chore.history = chore.history.filter(h => h !== dateString);
             this.saveChores();
         }
     }
@@ -66,14 +106,23 @@ class ChoreManager {
 
     // 最後にやってからの経過日数を計算
     getDaysSinceLastDone(chore) {
-        if (!chore.lastDone) {
+        if (!chore.history || chore.history.length === 0) {
             return null;
         }
-        const lastDone = new Date(chore.lastDone);
+        // 履歴は既にソート済み（新しい順）なので最初の要素を使用
+        const lastDone = new Date(chore.history[0]);
         const now = new Date();
         const diffTime = now - lastDone;
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
         return diffDays;
+    }
+
+    // 最後の実施日を取得
+    getLastDoneDate(chore) {
+        if (!chore.history || chore.history.length === 0) {
+            return null;
+        }
+        return chore.history[0];
     }
 
     // 経過日数に基づくステータスを取得
@@ -100,6 +149,7 @@ class ChoreUI {
         this.emptyState = document.getElementById('empty-state');
         this.addChoreForm = document.getElementById('add-chore-form');
         this.choreNameInput = document.getElementById('chore-name-input');
+        this.currentChoreId = null; // モーダルで使用する家事ID
 
         this.initEventListeners();
         this.render();
@@ -137,6 +187,64 @@ class ChoreUI {
         this.render();
     }
 
+    // 日付選択モーダルを開く
+    handleAddWithDate(id) {
+        this.currentChoreId = id;
+        this.showDateModal();
+    }
+
+    // 日付選択モーダルを表示
+    showDateModal() {
+        const modal = document.getElementById('date-modal');
+        const dateInput = document.getElementById('date-input');
+        // デフォルトを今日に設定
+        dateInput.value = new Date().toISOString().split('T')[0];
+        modal.style.display = 'flex';
+    }
+
+    // 日付選択モーダルを閉じる
+    closeDateModal() {
+        const modal = document.getElementById('date-modal');
+        modal.style.display = 'none';
+        this.currentChoreId = null;
+    }
+
+    // 選択した日付で記録を追加
+    handleSubmitDate() {
+        const dateInput = document.getElementById('date-input');
+        const dateValue = dateInput.value;
+
+        if (dateValue && this.currentChoreId) {
+            // 日付文字列をISO形式に変換
+            const dateISO = new Date(dateValue + 'T12:00:00').toISOString();
+            this.choreManager.addHistory(this.currentChoreId, dateISO);
+            this.closeDateModal();
+            this.render();
+        }
+    }
+
+    // 履歴の表示/非表示を切り替え
+    toggleHistory(id) {
+        const historyElement = document.getElementById(`history-${id}`);
+        const toggleButton = document.getElementById(`toggle-history-${id}`);
+
+        if (historyElement.style.display === 'none' || historyElement.style.display === '') {
+            historyElement.style.display = 'block';
+            toggleButton.textContent = '履歴を非表示';
+        } else {
+            historyElement.style.display = 'none';
+            toggleButton.textContent = '履歴を表示';
+        }
+    }
+
+    // 履歴を削除
+    handleDeleteHistory(choreId, dateString) {
+        if (confirm('この記録を削除しますか？')) {
+            this.choreManager.deleteHistory(choreId, dateString);
+            this.render();
+        }
+    }
+
     // UIを再描画
     render() {
         const chores = this.choreManager.getAllChores();
@@ -152,10 +260,25 @@ class ChoreUI {
             // イベントリスナーを追加
             chores.forEach(chore => {
                 const doneButton = document.getElementById(`done-${chore.id}`);
+                const addDateButton = document.getElementById(`add-date-${chore.id}`);
                 const deleteButton = document.getElementById(`delete-${chore.id}`);
+                const toggleHistoryButton = document.getElementById(`toggle-history-${chore.id}`);
 
                 doneButton.addEventListener('click', () => this.handleMarkAsDone(chore.id));
+                addDateButton.addEventListener('click', () => this.handleAddWithDate(chore.id));
                 deleteButton.addEventListener('click', () => this.handleDeleteChore(chore.id));
+
+                if (toggleHistoryButton) {
+                    toggleHistoryButton.addEventListener('click', () => this.toggleHistory(chore.id));
+                }
+
+                // 履歴削除ボタンのイベントリスナー
+                chore.history.forEach((date, index) => {
+                    const deleteHistoryButton = document.getElementById(`delete-history-${chore.id}-${index}`);
+                    if (deleteHistoryButton) {
+                        deleteHistoryButton.addEventListener('click', () => this.handleDeleteHistory(chore.id, date));
+                    }
+                });
             });
         }
     }
@@ -171,7 +294,7 @@ class ChoreUI {
             dateText = 'まだ記録がありません';
             daysText = '未実施';
         } else {
-            const lastDoneDate = new Date(chore.lastDone);
+            const lastDoneDate = new Date(this.choreManager.getLastDoneDate(chore));
             dateText = `最後の実施: ${this.formatDate(lastDoneDate)}`;
 
             if (days === 0) {
@@ -183,6 +306,9 @@ class ChoreUI {
             }
         }
 
+        // 履歴のHTML生成
+        const historyHTML = this.createHistoryHTML(chore);
+
         return `
             <div class="chore-card status-${status}">
                 <div class="chore-info">
@@ -191,11 +317,41 @@ class ChoreUI {
                         ${dateText}
                         <span class="days-badge">${daysText}</span>
                     </div>
+                    ${historyHTML}
                 </div>
                 <div class="chore-actions">
                     <button id="done-${chore.id}" class="done-button">今日やった</button>
+                    <button id="add-date-${chore.id}" class="add-date-button">日付指定</button>
                     <button id="delete-${chore.id}" class="delete-button">削除</button>
                 </div>
+            </div>
+        `;
+    }
+
+    // 履歴のHTMLを生成
+    createHistoryHTML(chore) {
+        if (!chore.history || chore.history.length === 0) {
+            return '';
+        }
+
+        const toggleButton = chore.history.length > 0
+            ? `<button id="toggle-history-${chore.id}" class="toggle-history-button">履歴を表示 (${chore.history.length}件)</button>`
+            : '';
+
+        const historyItems = chore.history.map((date, index) => {
+            const dateObj = new Date(date);
+            return `
+                <div class="history-item">
+                    <span>${this.formatDate(dateObj)}</span>
+                    <button id="delete-history-${chore.id}-${index}" class="delete-history-button">×</button>
+                </div>
+            `;
+        }).join('');
+
+        return `
+            ${toggleButton}
+            <div id="history-${chore.id}" class="history-list" style="display: none;">
+                ${historyItems}
             </div>
         `;
     }
@@ -220,4 +376,21 @@ class ChoreUI {
 document.addEventListener('DOMContentLoaded', () => {
     const choreManager = new ChoreManager();
     const choreUI = new ChoreUI(choreManager);
+
+    // モーダルのイベントリスナー
+    const modal = document.getElementById('date-modal');
+    const closeModalButton = document.getElementById('close-modal');
+    const cancelModalButton = document.getElementById('cancel-modal');
+    const submitDateButton = document.getElementById('submit-date');
+
+    closeModalButton.addEventListener('click', () => choreUI.closeDateModal());
+    cancelModalButton.addEventListener('click', () => choreUI.closeDateModal());
+    submitDateButton.addEventListener('click', () => choreUI.handleSubmitDate());
+
+    // モーダルの外側をクリックしたら閉じる
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            choreUI.closeDateModal();
+        }
+    });
 });

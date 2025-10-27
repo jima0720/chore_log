@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>いつやった？ - 家事記録アプリ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 いつやった？</h1>
+            <p class="subtitle">家事の記録を簡単に管理</p>
+        </header>
+
+        <div class="add-chore-section">
+            <h2>新しい家事を追加</h2>
+            <form id="add-chore-form">
+                <input
+                    type="text"
+                    id="chore-name-input"
+                    placeholder="例：トイレ掃除、掃除機がけ、お風呂掃除"
+                    required
+                >
+                <button type="submit">追加</button>
+            </form>
+        </div>
+
+        <div class="chores-section">
+            <h2>家事リスト</h2>
+            <div id="chores-list" class="chores-list">
+                <!-- 家事リストがここに表示されます -->
+            </div>
+            <div id="empty-state" class="empty-state">
+                <p>まだ家事が登録されていません</p>
+                <p>上のフォームから家事を追加してください</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+/* リセットと基本設定 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* ヘッダー */
+header {
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* 家事追加セクション */
+.add-chore-section {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+}
+
+.add-chore-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+#add-chore-form {
+    display: flex;
+    gap: 10px;
+}
+
+#chore-name-input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+#chore-name-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+#add-chore-form button {
+    padding: 12px 30px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#add-chore-form button:hover {
+    background: #5568d3;
+}
+
+/* 家事リストセクション */
+.chores-section {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.chores-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.chores-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* 家事カード */
+.chore-card {
+    background: #f9f9f9;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-left: 5px solid;
+}
+
+.chore-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* 色分け */
+.chore-card.status-recent {
+    border-left-color: #4caf50;
+}
+
+.chore-card.status-soon {
+    border-left-color: #ff9800;
+}
+
+.chore-card.status-overdue {
+    border-left-color: #f44336;
+}
+
+.chore-card.status-never {
+    border-left-color: #9e9e9e;
+}
+
+.chore-info {
+    flex: 1;
+}
+
+.chore-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.chore-date {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.days-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.status-recent .days-badge {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-soon .days-badge {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.status-overdue .days-badge {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.status-never .days-badge {
+    background: #f5f5f5;
+    color: #616161;
+}
+
+.chore-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.done-button {
+    padding: 10px 20px;
+    background: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.done-button:hover {
+    background: #45a049;
+}
+
+.delete-button {
+    padding: 10px 15px;
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.delete-button:hover {
+    background: #da190b;
+}
+
+/* 空の状態 */
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+}
+
+.empty-state p {
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.empty-state p:first-child {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #666;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 2rem;
+    }
+
+    .chore-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .chore-actions {
+        width: 100%;
+    }
+
+    .chore-actions button {
+        flex: 1;
+    }
+
+    #add-chore-form {
+        flex-direction: column;
+    }
+
+    #add-chore-form button {
+        width: 100%;
+    }
+}

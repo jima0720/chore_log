@@ -19,11 +19,58 @@
                 <input
                     type="text"
                     id="chore-name-input"
-                    placeholder="例：トイレ掃除、掃除機がけ、お風呂掃除"
+                    list="chore-suggestions"
+                    placeholder="リストから選択、または入力してください"
                     required
                 >
+                <datalist id="chore-suggestions">
+                    <!-- 掃除 -->
+                    <option value="掃除機がけ">
+                    <option value="床の拭き掃除">
+                    <option value="トイレ掃除">
+                    <option value="お風呂掃除">
+                    <option value="洗面所掃除">
+                    <option value="キッチン掃除">
+                    <option value="窓拭き">
+                    <option value="ベランダ掃除">
+                    <option value="玄関掃除">
+                    <option value="エアコン掃除">
+                    <option value="換気扇掃除">
+
+                    <!-- 洗濯 -->
+                    <option value="洗濯">
+                    <option value="布団干し">
+                    <option value="シーツ交換">
+                    <option value="タオル交換">
+
+                    <!-- キッチン -->
+                    <option value="食器洗い">
+                    <option value="冷蔵庫整理">
+                    <option value="シンク磨き">
+                    <option value="ゴミ捨て">
+                    <option value="生ゴミ処理">
+
+                    <!-- その他 -->
+                    <option value="観葉植物の水やり">
+                    <option value="郵便物整理">
+                    <option value="クローゼット整理">
+                    <option value="靴箱整理">
+                </datalist>
                 <button type="submit">追加</button>
             </form>
+
+            <!-- クイック追加ボタン -->
+            <div class="quick-add-section">
+                <p class="quick-add-label">よく使う家事:</p>
+                <div class="quick-add-buttons" id="quick-add-buttons">
+                    <button type="button" class="quick-add-btn" data-chore="掃除機がけ">掃除機がけ</button>
+                    <button type="button" class="quick-add-btn" data-chore="トイレ掃除">トイレ掃除</button>
+                    <button type="button" class="quick-add-btn" data-chore="お風呂掃除">お風呂掃除</button>
+                    <button type="button" class="quick-add-btn" data-chore="洗濯">洗濯</button>
+                    <button type="button" class="quick-add-btn" data-chore="食器洗い">食器洗い</button>
+                    <button type="button" class="quick-add-btn" data-chore="ゴミ捨て">ゴミ捨て</button>
+                </div>
+            </div>
         </div>
 
         <div class="chores-section">

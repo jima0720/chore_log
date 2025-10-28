@@ -161,6 +161,28 @@ class ChoreUI {
             e.preventDefault();
             this.handleAddChore();
         });
+
+        // クイック追加ボタンのイベントリスナー
+        const quickAddButtons = document.querySelectorAll('.quick-add-btn');
+        quickAddButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const choreName = button.getAttribute('data-chore');
+                this.handleQuickAdd(choreName);
+            });
+        });
+    }
+
+    // クイック追加のハンドラー
+    handleQuickAdd(choreName) {
+        // 既に同じ名前の家事が存在するかチェック
+        const exists = this.choreManager.chores.some(chore => chore.name === choreName);
+
+        if (exists) {
+            alert(`「${choreName}」は既に登録されています`);
+        } else {
+            this.choreManager.addChore(choreName);
+            this.render();
+        }
     }
 
     // 家事を追加するハンドラー

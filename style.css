@@ -84,6 +84,48 @@ header h1 {
     background: #5568d3;
 }
 
+/* クイック追加セクション */
+.quick-add-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.quick-add-label {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.quick-add-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.quick-add-btn {
+    padding: 8px 16px;
+    background: #f0f0f0;
+    color: #333;
+    border: 2px solid #e0e0e0;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.quick-add-btn:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+    transform: translateY(-2px);
+}
+
+.quick-add-btn:active {
+    transform: translateY(0);
+}
+
 /* 家事リストセクション */
 .chores-section {
     background: white;

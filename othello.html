@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>オセロゲーム</title>
+    <link rel="stylesheet" href="othello.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 オセロゲーム</h1>
+        </header>
+
+        <div class="game-info">
+            <div class="player-info">
+                <div class="player black-player" id="blackPlayer">
+                    <div class="disc black"></div>
+                    <div class="player-details">
+                        <span class="player-name">黒</span>
+                        <span class="score" id="blackScore">2</span>
+                    </div>
+                </div>
+                <div class="turn-indicator" id="turnIndicator">
+                    黒のターン
+                </div>
+                <div class="player white-player" id="whitePlayer">
+                    <div class="disc white"></div>
+                    <div class="player-details">
+                        <span class="player-name">白</span>
+                        <span class="score" id="whiteScore">2</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="board-container">
+            <div class="board" id="board">
+                <!-- ボードは JavaScript で生成 -->
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-primary" id="resetBtn">新しいゲーム</button>
+            <button class="btn-secondary" id="hintBtn">ヒント表示</button>
+        </div>
+
+        <div class="message" id="message"></div>
+    </div>
+
+    <script src="othello.js"></script>
+</body>
+</html>
